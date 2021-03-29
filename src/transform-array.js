@@ -1,42 +1,24 @@
 const CustomError = require("../extensions/custom-error");
 
 module.exports = function transform(arr) {
-    let newArr = []
-    if (!Array.isArray(arr)) {
-        throw new TypeError
-    }
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i] === '--discard-prev') {
-            newArr.splice(i - 1, 2)
-        }
-        if (arr[i] === '--double-prev') {
-            newArr.push(arr[i - 1])
-        }
-        if (arr[i] === '--double-next') {
-            newArr.push(arr[i + 1])
-        }
-        if (arr[i] === '--discard-next') {
-            i++
-            i++
-        } else {
-            newArr.push(arr[i])
-        }
-    }
-    for(let i = 0; i < newArr.length; i++){
-        if(typeof(newArr[i]) !== 'number'){
-            newArr.splice(i,1)
-        }
-    }
-    for(let i = 0; i < newArr.length; i++){
-        if(typeof(newArr[i]) === 'string'){
-            newArr.splice(i,1)
-        }
-    }
-    /*for(let j = 0; j < newArr.length; j++){
-        if(newArr[j] === undefined){
-            newArr.splice(j,1)
-        }
-    }*/
+    if ( !Array.isArray(arr) ) throw 'Error';
+    let newArr = [...arr];
 
-    return newArr
+    let dbn = "--double-next";
+    let dbp = "--double-prev";
+    let dsn = "--discard-next";
+    let dsp = "--discard-prev";
+
+    for (let i = 0; i < newArr.length; i++) {
+        if (newArr[0] === dbp || newArr[0] === dsp) newArr.shift();
+        if (newArr[newArr.length - 1] === dbn || newArr[newArr.length - 1] === dsn ) newArr.pop();
+        if (newArr[i] === dsn && (newArr[i+2] === dbp || newArr[i+2] === dsp)) newArr.splice(i, 3);
+        if (newArr[i] === dbn) newArr[i] = newArr[i + 1];
+        if (newArr[i] === dbp) newArr[i] = newArr[i - 1];
+        if (newArr[0] === dbp || newArr[0] === dsp) newArr.shift();
+        if (newArr[newArr.length - 1] === dbn || newArr[newArr.length - 1] === dsn ) newArr.pop();
+        if (newArr[i] === dsn) newArr.splice(i--, 2);
+        if (newArr[i] === dsp) newArr.splice(--i, 2);
+    }
+    return newArr;
 };
